@@ -32,7 +32,7 @@ export default function Leads() {
   const fetchLeads = async (isInitial = false) => {
     try {
       if (isInitial) setLoading(true);
-      const response = await api.get('http://localhost:5000/api/get-leads');
+      const response = await api.get('https://lead-backend-snowy.vercel.app/api');
       setLeads(response.data);
     } catch (error) {
       console.error("Error fetching leads:", error);
