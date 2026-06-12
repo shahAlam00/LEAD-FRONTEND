@@ -6,7 +6,7 @@ dist/
 .env.production
 
 # Logs
-*.log
+*.log 
 npm-debug.log*
 
 # OS
