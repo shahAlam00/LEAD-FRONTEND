@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import axios from "axios";
+import api from "../lib/axios.js";
 import { Plus, Search, Layers, Compass, FileSpreadsheet, FileText, ChevronLeft, ChevronRight } from "lucide-react";
 
 /* ---------------- Exact Match Table Skeleton ---------------- */
@@ -32,7 +32,7 @@ export default function Leads() {
   const fetchLeads = async (isInitial = false) => {
     try {
       if (isInitial) setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/get-leads');
+      const response = await api.get('http://localhost:5000/api/get-leads');
       setLeads(response.data);
     } catch (error) {
       console.error("Error fetching leads:", error);
