@@ -11,31 +11,44 @@ import Team from "./pages/Team";
 import Setting from "./pages/Setting";
 import Facebook from "./pages/Facebook";
 import Instagram from "./pages/Instagram";
+import LoginForm from "./components/LoginForm.jsx";
+// import LoginLending from './pages/LoginLending.jsx'
+import { Navigate } from "react-router-dom";
+
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  
+  // Agar token nahi hai, login page par bhej do
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  // Agar token hai, dashboard/layout dikhao
+  return children;
+};
 function App() {
   return (
     <BrowserRouter> 
       <Routes>
+        {/* Public Route */}
+        <Route path='/login' element={<LoginForm role="admin" title="Admin Login" subTitle="Sign in to manage the organization"/>}/>
 
-        <Route element={<AppLayout />}>
-
+        {/* Protected Routes (Wrapper) */}
+        <Route element={
+          <ProtectedRoute>
+            <AppLayout />
+          </ProtectedRoute>
+        }>
           <Route path="/" element={<Dashboard />} />
-
           <Route path="/leads" element={<Leads />} />
-
           <Route path="/whatsapp" element={<Whatsapp />} />
           <Route path="/facebook" element={<Facebook />} />
           <Route path="/instagram" element={<Instagram />} />
-
           <Route path="/email" element={<Email />} />
-
           <Route path="/analytics" element={<Analytics />} />
-
           <Route path="/team" element={<Team />} />
-
           <Route path="/setting" element={<Setting />} />
-
         </Route>
-
       </Routes>
     </BrowserRouter>
   );
