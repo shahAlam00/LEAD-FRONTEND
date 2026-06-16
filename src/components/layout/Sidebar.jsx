@@ -1,4 +1,5 @@
-import { NavLink, useNavigate } from "react-router-dom"; // useNavigate import kiya
+import { useState } from "react"; // useState import kiya dropdown open/close ke liye
+import { NavLink, useNavigate } from "react-router-dom"; 
 import {
   LayoutDashboard,
   Users,
@@ -6,30 +7,50 @@ import {
   Mail,
   BarChart3,
   Settings,
-  LogOut, // LogOut icon import kiya
-} from "lucide-react";
+  LogOut,
+  ChevronDown, // Dropdown indicator ke liye
+  ChevronUp,
+    // Social Icons
 
-const menuItems = [
-  { title: "Dashboard", icon: LayoutDashboard, path: "/" },
-  { title: "Leads Pipeline", icon: Users, path: "/leads" },
-  { title: "Lead Inbox", icon: MessageCircle, path: "/whatsapp" },
-  { title: "Email Automations", icon: Mail, path: "/email" },
-  { title: "Analytics", icon: BarChart3, path: "/analytics" },
-  { title: "System Settings", icon: Settings, path: "/setting" },
-];
+} from "lucide-react";
+import { FaFacebook, FaInstagram, FaFacebookMessenger } from "react-icons/fa";
+
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  
+  // State to manage Lead Inbox dropdown toggle
+  const [isInboxOpen, setIsInboxOpen] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Token delete kiya
-    navigate("/login"); // Login page par redirect kiya
+    localStorage.removeItem("token"); 
+    navigate("/login"); 
   };
+
+  // Main navigation items config
+  const menuItems = [
+    { title: "Dashboard", icon: LayoutDashboard, path: "/" },
+    { title: "Leads Pipeline", icon: Users, path: "/leads" },
+    // Lead Inbox configured as dropdown now
+    { 
+      title: "Lead Inbox", 
+      icon: MessageCircle, 
+      isDropdown: true,
+      children: [
+        { title: "Facebook", icon:  FaFacebook, path: "/facebook" },
+        { title: "Instagram", icon:  FaInstagram, path: "/instagram" },
+        { title: "WhatsApp", icon: MessageCircle, path: "/whatsapp" },
+      ]
+    },
+    { title: "Email Automations", icon: Mail, path: "/email" },
+    { title: "Analytics", icon: BarChart3, path: "/analytics" },
+    { title: "System Settings", icon: Settings, path: "/setting" },
+  ];
 
   return (
     <aside className="fixed left-0 top-0 w-64 h-screen bg-[#020617] border-r border-slate-800 flex flex-col z-50">
       
-      {/* Logo */}
+      {/* Logo Section */}
       <div className="h-20 flex items-center px-6 border-b border-slate-800">
         <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-lg">C</div>
         <div className="ml-3">
@@ -38,11 +59,60 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Menu */}
+      {/* Menu Navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         <div className="space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon;
+
+            // Render logic if the item is a Dropdown (e.g., Lead Inbox)
+            if (item.isDropdown) {
+              return (
+                <div key={item.title} className="space-y-1">
+                  <button
+                    onClick={() => setIsInboxOpen(!isInboxOpen)}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 ${
+                      isInboxOpen 
+                        ? "text-white bg-slate-800/40" 
+                        : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon size={18} />
+                      <span className="text-sm font-medium">{item.title}</span>
+                    </div>
+                    {isInboxOpen ? <ChevronUp size={16} className="text-slate-500" /> : <ChevronDown size={16} className="text-slate-500" />}
+                  </button>
+
+                  {/* Nested Sub-Menu Area */}
+                  {isInboxOpen && (
+                    <div className="pl-4 ml-4 border-l border-slate-800 space-y-1 transition-all duration-300">
+                      {item.children.map((child) => {
+                        const ChildIcon = child.icon;
+                        return (
+                          <NavLink
+                            key={child.path}
+                            to={child.path}
+                            className={({ isActive }) =>
+                              `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 text-xs font-medium ${
+                                isActive
+                                  ? "bg-blue-600/10 text-blue-400 border border-blue-500/20"
+                                  : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
+                              }`
+                            }
+                          >
+                            <ChildIcon size={14} />
+                            <span>{child.title}</span>
+                          </NavLink>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            // Normal Flat Links Setup
             return (
               <NavLink
                 key={item.path}
@@ -64,7 +134,7 @@ export default function Sidebar() {
         </div>
       </nav>
 
-      {/* Footer with Logout Button */}
+      {/* Footer Profile Control Panel */}
       <div className="border-t border-slate-800 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -75,7 +145,6 @@ export default function Sidebar() {
             </div>
           </div>
           
-          {/* Logout Button */}
           <button 
             onClick={handleLogout}
             className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
