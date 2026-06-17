@@ -10,10 +10,12 @@ import {
   LogOut,
   ChevronDown, // Dropdown indicator ke liye
   ChevronUp,
+  
     // Social Icons
 
 } from "lucide-react";
 import { FaFacebook, FaInstagram, FaFacebookMessenger } from "react-icons/fa";
+import { FiLayers } from "react-icons/fi";
 
 
 export default function Sidebar() {
@@ -31,6 +33,8 @@ export default function Sidebar() {
   const menuItems = [
     { title: "Dashboard", icon: LayoutDashboard, path: "/" },
     { title: "Leads Pipeline", icon: Users, path: "/leads" },
+    {title: "Super Admin",    icon : FiLayers, path: "/SuperAdmin"},
+    
     // Lead Inbox configured as dropdown now
     { 
       title: "Lead Inbox", 
@@ -44,7 +48,8 @@ export default function Sidebar() {
     },
     { title: "Email Automations", icon: Mail, path: "/email" },
     { title: "Analytics", icon: BarChart3, path: "/analytics" },
-    { title: "System Settings", icon: Settings, path: "/setting" },
+    // { title: "System Settings", icon: Settings, path: "/setting" },
+    {title: "System Setting",    icon : Settings, path: "/admin"},
   ];
 
   return (
@@ -60,7 +65,7 @@ export default function Sidebar() {
       </div>
 
       {/* Menu Navigation */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
+      <nav className="flex-1 overflow-y-hidden px-3 py-4">
         <div className="space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon;

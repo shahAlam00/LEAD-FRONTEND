@@ -14,6 +14,9 @@ import Instagram from "./pages/Instagram";
 import LoginForm from "./components/LoginForm.jsx";
 // import LoginLending from './pages/LoginLending.jsx'
 import { Navigate } from "react-router-dom";
+import SuperAdmin from "./pages/SuperAdmin.jsx";
+import CreateSuperAdminPage from "./pages/CreateSuperAdminPage.jsx";
+import Admin from "./pages/Admin.jsx";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -40,8 +43,11 @@ function App() {
           </ProtectedRoute>
         }>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/SuperAdmin" element={<SuperAdmin/>}/>
+          <Route path="/create" element={<CreateSuperAdminPage/>}/>
           <Route path="/leads" element={<Leads />} />
           <Route path="/whatsapp" element={<Whatsapp />} />
+          <Route path="/admin" element={<Admin/>}/>
           <Route path="/facebook" element={<Facebook />} />
           <Route path="/instagram" element={<Instagram />} />
           <Route path="/email" element={<Email />} />

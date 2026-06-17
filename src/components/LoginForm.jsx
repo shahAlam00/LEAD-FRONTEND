@@ -1,47 +1,49 @@
-import React, { useEffect,useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import LoginLeftSide from './LoginLeftSide';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon, EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react';
+import { ArrowLeftIcon, EyeIcon, EyeOffIcon, Loader2Icon, UserCheckIcon } from 'lucide-react';
 import api from "../lib/axios.js";
-const LoginForm = ({ role, title, subTitle }) => {
+
+const LoginForm = ({ title, subTitle }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [selectedRole, setSelectedRole] = useState('Admin'); // Role state added
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     
     const navigate = useNavigate();
 
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
 
-    try {
-        // Axios ke liye syntax:
-        const response = await api.post("/auth/login", {
-            email, 
-            password 
-        });
+        try {
+            // Role ko payload mein pass kiya gaya hai
+            const response = await api.post("/auth/login", {
+                email, 
+                password,
+                role: selectedRole.toLowerCase() // Sends 'admin' or 'superadmin'
+            });
 
-        // Axios mein 'data' property mein response body hoti hai
-        if (response.data && response.data.token) {
-            localStorage.setItem("token", response.data.token);
-            navigate("/"); 
+            if (response.data && response.data.token) {
+                localStorage.setItem("token", response.data.token);
+                localStorage.setItem("role", response.data.role || selectedRole); 
+                navigate("/"); 
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || "Login failed, please check credentials");
+        } finally {
+            setLoading(false);
         }
-    } catch (err) {
-        // Axios error handling
-        setError(err.response?.data?.message || "Login failed, please check credentials");
-    } finally {
-        setLoading(false);
-    }
-};
-    // LoginForm.jsx mein add karein
-useEffect(() => {
-  if (localStorage.getItem("token")) {
-    navigate("/");
-  }
-}, [navigate]);
+    };
+
+    useEffect(() => {
+        if (localStorage.getItem("token")) {
+            navigate("/");
+        }
+    }, [navigate]);
 
     return (
         <div className='min-h-screen flex flex-col md:flex-row'>
@@ -66,6 +68,25 @@ useEffect(() => {
                     )}
                     
                     <form className='space-y-5' onSubmit={handleSubmit}>
+                        {/* Dropdown for Role Selection */}
+                        <div>
+                            <label className='block text-sm font-medium text-slate-700 mb-2'>Select Portal Role</label>
+                            <div className='relative'>
+                                <select 
+                                    value={selectedRole}
+                                    onChange={(e) => setSelectedRole(e.target.value)}
+                                    className='w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none pr-10 text-zinc-800 text-sm'
+                                >
+                                    <option value="Admin">Admin</option>
+                                    <option value="Superadmin">Superadmin</option>
+                                </select>
+                                <div className='absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400'>
+                                    <UserCheckIcon size={18} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Email Field */}
                         <div>
                             <label className='block text-sm font-medium text-slate-700 mb-2'>Email address</label>
                             <input 
@@ -74,9 +95,11 @@ useEffect(() => {
                                 onChange={(e) => setEmail(e.target.value)} 
                                 required 
                                 placeholder='zyntrix@example.com'
-                                className='w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all'
+                                className='w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm'
                             />
                         </div>
+
+                        {/* Password Field */}
                         <div>
                             <label className='block text-sm font-medium text-slate-700 mb-2'>Password</label>
                             <div className='relative'>
@@ -85,7 +108,7 @@ useEffect(() => {
                                     value={password} 
                                     onChange={(e) => setPassword(e.target.value)} 
                                     required 
-                                    className='w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all pr-11' 
+                                    className='w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all pr-11 text-sm' 
                                     placeholder='••••••••' 
                                 />
                                 <button type='button' className='absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors'
@@ -94,10 +117,12 @@ useEffect(() => {
                                 </button>
                             </div>
                         </div>
+
+                        {/* Submit Button */}
                         <button type='submit' disabled={loading}
-                            className='w-full py-3 bg-linear-to-r from-indigo-600 to-indigo-500 text-white rounded-md text-sm font-semibold hover:from-indigo-700 hover:to-indigo-600 disabled:opacity-50 transition-all duration-200 shadow-lg shadow-indigo-500/25 active:scale-[0.98] flex items-center justify-center'>
+                            className='w-full py-3 bg-linear-to-r from-indigo-600 to-indigo-500 text-white rounded-md text-sm font-semibold hover:from-indigo-700 hover:to-indigo-600 disabled:opacity-50 transition-all duration-200 shadow-lg shadow-indigo-500/25 active:scale-[0.98] flex items-center justify-center cursor-pointer'>
                             {loading && <Loader2Icon className='animate-spin w-4 h-4 mr-2'/>}
-                            Sign In
+                            Sign In as {selectedRole}
                         </button>
                     </form>
                 </div>
